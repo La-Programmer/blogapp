@@ -12,7 +12,7 @@ const port = process.env.PORT;
 const app = express();
 
 app.use(express.json());
-app.use(cors({ credentials: true }));
+app.use(cors()); //allows all origins
 app.use('/api/user', UserRouter);
 app.use('/api/post', PostRouter);
 

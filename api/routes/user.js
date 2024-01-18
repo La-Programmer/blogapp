@@ -34,11 +34,21 @@ UserRouter.post('/login', async (req, res) => {
 
 UserRouter.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (name && email && password) {
+    const { name, user_name, account_type, email, password } = req.body;
+    const existUser = await User.findOne({ user_name });
+    const existUser2 = await User.findOne({ email });
+    if (name && email && password && !existUser && !existUser2) {
       const hashPassword = await bcrypt.hash(password, 14);
-      const user = await User.create({ name, email, password: hashPassword });
+      const user = await User.create({
+        name,
+        user_name,
+        account_type,
+        email,
+        password: hashPassword,
+      });
       res.status(200).json({ msg: 'User registered successfully', user: user });
+    } else if (existUser || existUser2) {
+      res.status(422).json({ msg: 'User already exists' });
     } else {
       res.status(422).json({ msg: 'Missing credentials' });
     }
