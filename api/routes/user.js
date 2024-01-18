@@ -48,7 +48,7 @@ UserRouter.post('/register', async (req, res) => {
       });
       res.status(200).json({ msg: 'User registered successfully', user: user });
     } else if (existUser || existUser2) {
-      res.status(422).json({ msg: 'User already exists' });
+      res.status(400).json({ msg: 'User already exists' });
     } else {
       res.status(422).json({ msg: 'Missing credentials' });
     }
