@@ -28,7 +28,10 @@ UserRouter.post('/login', async (req, res) => {
       res.status(401).json({ msg: 'Wrong credentials' });
     }
     const token = jwt.sign({ id: existUser._id }, process.env.SECRET);
-    res.status(201).json({ msg: 'User logged in', token: token });
+    res
+      .status(201)
+      .json({ msg: 'User logged in', token: token, user: existUser });
+    res.cookie('token', token);
   } catch (error) {}
 });
 
