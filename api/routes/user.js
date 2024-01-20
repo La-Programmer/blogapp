@@ -31,7 +31,7 @@ UserRouter.post('/login', async (req, res) => {
     res
       .status(201)
       .json({ msg: 'User logged in', token: token, user: existUser });
-    res.cookie('token', token);
+    res.cookie('token', token); //STUDY FOR TOKEN AUTHENTICATION AND LOGOUT FUNCTIONALITY
   } catch (error) {}
 });
 
@@ -50,8 +50,10 @@ UserRouter.post('/register', async (req, res) => {
         password: hashPassword,
       });
       res.status(200).json({ msg: 'User registered successfully', user: user });
-    } else if (existUser || existUser2) {
-      res.status(400).json({ msg: 'User already exists' });
+    } else if (existUser) {
+      res.status(400).json({ msg: 'Username taken' });
+    } else if (existUser2) {
+      res.status(400).json({ msg: 'Email taken' });
     } else {
       res.status(422).json({ msg: 'Missing credentials' });
     }
