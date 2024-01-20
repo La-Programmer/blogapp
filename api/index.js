@@ -12,7 +12,7 @@ const port = process.env.PORT;
 const app = express();
 
 const corsOptions = {
-  origin: 'https://along-preview.netlify.app',
+  origin: 'http://localhost:5173',
   credentials: true,
 };
 
