@@ -12,12 +12,12 @@ const port = process.env.PORT;
 const app = express();
 
 const corsOptions = {
-  origin: ['https://along-preview.netlify.app', 'http://loclahost:5173'],
+  origin: ['https://along-preview.netlify.app', 'http://localhost:5173'],
   credentials: true,
 };
 
 app.use(express.json());
-app.use(cors(corsOptions)); //allows all origins
+app.use(cors(corsOptions));
 app.use('/api/user', UserRouter);
 app.use('/api/post', PostRouter);
 
