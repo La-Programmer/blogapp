@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   account_type: {
     type: String,
     required: true,
+    default: 'user',
   },
   email: {
     type: String,
