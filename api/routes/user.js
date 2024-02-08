@@ -47,7 +47,7 @@ UserRouter.post('/login', async (req, res) => {
       .status(201)
       .json({
         msg: 'User logged in',
-        token: token,
+        token: tokenId,
         user: existUser,
         session: startSession,
       });
@@ -109,5 +109,17 @@ UserRouter.delete('/users/:email', async (req, res) => {
     res.status(500).json({ msg: 'Internal Server Error' });
   }
 });
+
+
+UserRouter.get('/sessions', async (req, res) => {
+  await Session.find()
+    .then((result) => {
+      res.status(200).json(result);
+    })
+    .catch((error) => {
+      res.status(400).json({ error: error });
+    });  
+})
+
 
 export default UserRouter;
