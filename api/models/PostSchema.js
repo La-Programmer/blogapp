@@ -1,4 +1,5 @@
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
+import Comment from './CommentSchema.js                                                                                                 ';
 
 const PostSchema = new mongoose.Schema({
   title: {
@@ -7,7 +8,7 @@ const PostSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: true
+    required: true,
   },
   image: {
     type: String,
@@ -17,7 +18,30 @@ const PostSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-
+  userEmail: {
+    type: String,
+    required: true,
+  },
+  category: {
+    type: String,
+    default: 'Popular junctions and roundabouts',
+  },
+  upvotes: {
+    type: Number,
+    default: 0,
+  },
+  downvotes: {
+    type: Number,
+    default: 0,
+  },
+  comments: {
+    type: Array,
+    default: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+  },
+  comment_number: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Post = mongoose.model('Post', PostSchema);

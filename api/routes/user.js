@@ -19,7 +19,7 @@ UserRouter.get('/', async (req, res) => {
       res.status(200).json(result);
     })
     .catch((error) => {
-      res.status(400).json({ error: error });
+      res.status(400).json({ error: error.message });
     });
 });
 
@@ -32,7 +32,7 @@ UserRouter.post('/login', async (req, res) => {
     }
     const comparePassword = await bcrypt.compare(password, existUser.password);
     if (!comparePassword) {
-      res.status(401).json({ msg: 'Wrong credentials' });
+      res.status(401).json({ error: 'Wrong credentials' });
     }
     const token = jwt.sign({ id: existUser._id }, process.env.SECRET);
 
@@ -43,16 +43,15 @@ UserRouter.post('/login', async (req, res) => {
       lastActivity: Date.now(),
     });
 
-    res
-      .status(201)
-      .json({
-        msg: 'User logged in',
-        token: tokenId,
-        user: existUser,
-        session: startSession,
-      });
-    res.cookie('token', token); //STUDY FOR TOKEN AUTHENTICATION AND LOGOUT FUNCTIONALITY
-  } catch (error) {}
+    res.status(201).json({
+      msg: 'User logged in',
+      token: tokenId,
+      user: existUser,
+      session: startSession,
+    });
+  } catch (error) {
+    res.status(400).json({ msg: 'Login failed', error: error.message });
+  }
 });
 
 UserRouter.post('/register', async (req, res) => {
@@ -75,18 +74,16 @@ UserRouter.post('/register', async (req, res) => {
         lastActivity: Date.now(),
       });
 
-      res
-        .status(200)
-        .json({
-          msg: 'User registered successfully',
-          user: user,
-          session: startSession,
-        });
+      res.status(200).json({
+        msg: 'User registered successfully',
+        user: user,
+        session: startSession,
+      });
     } else {
       res.status(422).json({ msg: 'Missing credentials' });
     }
   } catch (error) {
-    res.status(400).json({ msg: error });
+    res.status(400).json({ msg: 'Signup failed', error: error.message });
   }
 });
 
@@ -106,10 +103,11 @@ UserRouter.delete('/users/:email', async (req, res) => {
       .status(200)
       .json({ msg: 'User deleted successfully', user: deletedUser });
   } catch (error) {
-    res.status(500).json({ msg: 'Internal Server Error' });
+    res
+      .status(500)
+      .json({ msg: 'Internal Server Error', error: error.message });
   }
 });
-
 
 UserRouter.get('/sessions', async (req, res) => {
   await Session.find()
@@ -117,9 +115,10 @@ UserRouter.get('/sessions', async (req, res) => {
       res.status(200).json(result);
     })
     .catch((error) => {
-      res.status(400).json({ error: error });
-    });  
-})
-
+      res
+        .status(400)
+        .json({ msg: 'Failed to fetch sessions', error: error.message });
+    });
+});
 
 export default UserRouter;
