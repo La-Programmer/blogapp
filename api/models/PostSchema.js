@@ -11,7 +11,7 @@ const PostSchema = new mongoose.Schema({
     required: true,
   },
   image: {
-    type: String,
+    type: [Buffer],
     required: true,
   },
   date: {
@@ -33,10 +33,6 @@ const PostSchema = new mongoose.Schema({
   downvotes: {
     type: Number,
     default: 0,
-  },
-  comments: {
-    type: Array,
-    default: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   },
   comment_number: {
     type: Number,

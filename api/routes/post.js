@@ -2,38 +2,56 @@ import express from 'express';
 import Post from '../models/PostSchema.js';
 import Draft from '../models/DraftSchema.js';
 import checkSessionExpiration from '../middleware/auth.js';
+import checkUserSuspension from '../middleware/suspended.js';
 
 const PostRouter = express.Router();
 PostRouter.use(express.json());
 
 // Create posts. Including checkSessionExpiration middleware
-PostRouter.post('/', checkSessionExpiration, async (req, res) => {
-  try {
-    const { title, description, image, userEmail } = req.body;
-    const newPost = await Post.create({ title, description, image, userEmail });
-    res.status(201).json({ msg: 'Post created successfully', post: newPost });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ msg: 'Failed to create post', error: error.message });
+PostRouter.post(
+  '/',
+  checkUserSuspension,
+  checkSessionExpiration,
+  async (req, res) => {
+    try {
+      const { title, description, image, userEmail } = req.body;
+      const newPost = await Post.create({
+        title,
+        description,
+        image,
+        userEmail,
+      });
+      res.status(201).json({ msg: 'Post created successfully', post: newPost });
+    } catch (error) {
+      res
+        .status(400)
+        .json({ msg: 'Failed to create post', error: error.message });
+    }
   }
-});
+);
 
 // Save as draft function
-PostRouter.post('/draft', checkSessionExpiration, async (req, res) => {
-  try {
-    const { title, description, image, userEmail } = req.body;
-    const newDraft = await Draft.create({
-      title,
-      description,
-      image,
-      userEmail,
-    });
-    res.status(201).json({ msg: 'Saved as draft', draft: newDraft });
-  } catch (error) {
-    res.status(400).json({ msg: 'Failed to save draft', error: error.message });
+PostRouter.post(
+  '/draft',
+  checkUserSuspension,
+  checkSessionExpiration,
+  async (req, res) => {
+    try {
+      const { title, description, image, userEmail } = req.body;
+      const newDraft = await Draft.create({
+        title,
+        description,
+        image,
+        userEmail,
+      });
+      res.status(201).json({ msg: 'Saved as draft', draft: newDraft });
+    } catch (error) {
+      res
+        .status(400)
+        .json({ msg: 'Failed to save draft', error: error.message });
+    }
   }
-});
+);
 
 // Get all posts without authentication
 PostRouter.get('/', async (req, res) => {
@@ -145,5 +163,27 @@ PostRouter.put(
     }
   }
 );
+
+// Search for posts by title
+PostRouter.get('/search', checkSessionExpiration, async (req, res) => {
+  try {
+    const { searchQuery } = req.query;
+
+    if (!searchQuery) {
+      return res.status(400).json({ msg: 'Missing search query' });
+    }
+
+    // Using a regular expression to perform a case-insensitive search
+    const matchingPosts = await Post.find({
+      title: { $regex: new RegExp(searchQuery, 'i') },
+    });
+
+    res.status(200).json(matchingPosts);
+  } catch (error) {
+    res
+      .status(400)
+      .json({ msg: 'Failed to perform search', error: error.message });
+  }
+});
 
 export default PostRouter;

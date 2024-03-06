@@ -25,14 +25,10 @@ const CommentSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  replies: {
-    type: Array,
-    default: [],
-  },
   replies_count: {
     type: Number,
     default: 0,
-  }
+  },
 });
 
 const Comment = mongoose.model('Comment', CommentSchema);

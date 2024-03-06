@@ -3,7 +3,6 @@ import User from '../models/UserSchema.js';
 import Session from '../models/SessionSchema.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 
 const UserRouter = express.Router();
@@ -87,6 +86,54 @@ UserRouter.post('/register', async (req, res) => {
   }
 });
 
+// This route is for user password reseting.
+UserRouter.post('/reset-password', async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    // Check if the user with the provided email exists.
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    // Hash the new password.
+    const hashedPassword = await bcrypt.hash(newPassword, 14);
+
+    // Update the user's password in the database.
+    await User.updateOne({ email }, { password: hashedPassword });
+
+    res.status(200).json({ msg: 'Password reset successfully' });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: 'Internal Server Error', error: error.message });
+  }
+});
+
+// This route is getting all data for a particular user.
+UserRouter.get('/users/:email', async (req, res) => {
+  try {
+    const userEmail = req.params.email;
+
+    // Find user in database
+    const user = await User.findOne({ email: userEmail });
+
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    res
+      .status(200)
+      .json({ msg: 'User data retrieved successfully', user: user });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: 'Internal Server Error', error: error.message });
+  }
+});
+
 // This route is deleting a user from the database.
 UserRouter.delete('/users/:email', async (req, res) => {
   try {
@@ -102,6 +149,32 @@ UserRouter.delete('/users/:email', async (req, res) => {
     res
       .status(200)
       .json({ msg: 'User deleted successfully', user: deletedUser });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: 'Internal Server Error', error: error.message });
+  }
+});
+
+// Endpoint to suspend a user
+UserRouter.post('/suspend/:email', async (req, res) => {
+  try {
+    const userEmail = req.params.email;
+
+    // Find and update user's suspension status in the database.
+    const updatedUser = await User.findOneAndUpdate(
+      { email: userEmail },
+      { $set: { isSuspended: true } },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    res
+      .status(200)
+      .json({ msg: 'User suspended successfully', user: updatedUser });
   } catch (error) {
     res
       .status(500)
