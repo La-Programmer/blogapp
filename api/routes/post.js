@@ -14,12 +14,13 @@ PostRouter.post(
   checkSessionExpiration,
   async (req, res) => {
     try {
-      const { title, description, image, userEmail } = req.body;
+      const { title, description, image, userEmail, category } = req.body;
       const newPost = await Post.create({
         title,
         description,
         image,
         userEmail,
+        category,
       });
       res.status(201).json({ msg: 'Post created successfully', post: newPost });
     } catch (error) {
@@ -37,12 +38,13 @@ PostRouter.post(
   checkSessionExpiration,
   async (req, res) => {
     try {
-      const { title, description, image, userEmail } = req.body;
+      const { title, description, image, userEmail, category } = req.body;
       const newDraft = await Draft.create({
         title,
         description,
         image,
         userEmail,
+        category,
       });
       res.status(201).json({ msg: 'Saved as draft', draft: newDraft });
     } catch (error) {
