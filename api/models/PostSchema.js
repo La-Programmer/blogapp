@@ -29,9 +29,17 @@ const PostSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  upvotesArray: {
+    type: Array,
+    default: []
+  },
   downvotes: {
     type: Number,
     default: 0,
+  },
+  downvotesArray: {
+    type: Array,
+    default: []
   },
   comment_number: {
     type: Number,

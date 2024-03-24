@@ -33,7 +33,7 @@ UserRouter.post('/login', async (req, res) => {
     if (!comparePassword) {
       res.status(401).json({ error: 'Wrong credentials' });
     }
-    const token = jwt.sign({ id: existUser._id }, process.env.SECRET);
+    // const token = jwt.sign({ id: existUser._id }, process.env.SECRET);
 
     // Create authentication token session.
     const tokenId = generateSessionToken();

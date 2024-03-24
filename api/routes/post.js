@@ -129,14 +129,26 @@ PostRouter.delete('/:postId', checkSessionExpiration, async (req, res) => {
 // Upvote a post.
 PostRouter.put('/:postId/upvote', checkSessionExpiration, async (req, res) => {
   try {
-    const updatedPost = await Post.findByIdAndUpdate(
-      req.params.postId,
-      { $inc: { upvotes: 1 } },
-      { new: true }
-    );
-    res
-      .status(200)
-      .json({ msg: 'Post upvoted successfully', post: updatedPost });
+    const voterId = req.body;
+    const post = await Post.findById(req.params.postId);
+    if (!post.upvotesArray.includes(voterId.voterId)) {
+      const updatedArray = await Post.findByIdAndUpdate(
+        req.params.postId,
+        { $push: { upvotesArray: voterId.voterId } },
+        { new: true }
+      )
+      console.log(post.upvotesArray);
+      const updatedPost = await Post.findByIdAndUpdate(
+        req.params.postId,
+        { $inc: { upvotes: 1 } },
+        { new: true }
+      );
+      res
+        .status(200)
+        .json({ msg: 'Post upvoted successfully', post: updatedPost });
+    } else {
+      res.status(401).json({ error: 'You have upvoted already' });
+    }
   } catch (error) {
     res
       .status(400)
@@ -150,14 +162,26 @@ PostRouter.put(
   checkSessionExpiration,
   async (req, res) => {
     try {
-      const updatedPost = await Post.findByIdAndUpdate(
-        req.params.postId,
-        { $inc: { downvotes: 1 } },
-        { new: true }
-      );
-      res
-        .status(200)
-        .json({ msg: 'Post downvoted successfully', post: updatedPost });
+      const voterId = req.body;
+      const post = await Post.findById(req.params.postId);
+      if (!post.downvotesArray.includes(voterId.voterId)) {
+        const updatedArray = await Post.findByIdAndUpdate(
+          req.params.postId,
+          { $push: { downvotesArray: voterId.voterId } },
+          { new: true }
+        )
+        console.log(post.downvotesArray);
+        const updatedPost = await Post.findByIdAndUpdate(
+          req.params.postId,
+          { $inc: { downvotes: 1 } },
+          { new: true }
+        );
+        res
+          .status(200)
+          .json({ msg: 'Post downvoted successfully', post: updatedPost });
+      } else {
+        res.status(401).json({ error: 'You have downvoted already' });
+      }
     } catch (error) {
       res
         .status(400)
