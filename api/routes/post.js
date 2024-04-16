@@ -67,7 +67,7 @@ PostRouter.get('/', async (req, res) => {
   }
 });
 
-// Get all posts by categories
+// Get all posts by categories without authentication
 PostRouter.get('/Categories', async (req, res) => {
   try {
     const { category } = req.body;
@@ -94,17 +94,28 @@ PostRouter.get('/usersPosts', checkSessionExpiration, async (req, res) => {
 });
 
 // Update post. Including checkSessionExpiration middleware
+// Include limit on post updating
 PostRouter.put('/:postId', checkSessionExpiration, async (req, res) => {
   try {
-    const { title, description, image } = req.body;
-    const updatePost = await Post.findByIdAndUpdate(
-      req.params.postId,
-      { title, description, image },
-      { new: true }
-    );
-    res
-      .status(200)
-      .json({ msg: 'Post updated successfully', post: updatePost });
+    const { title, description, image, email } = req.body;
+    const oldPost = await Post.findById(req.params.postId)
+    console.log(email)
+    console.log(oldPost.userEmail)
+    console.log(`-----OLDPOST-----\n${oldPost}`)
+    if (oldPost.editted == 0 && (email == oldPost.userEmail)) {
+      const updatePost = await Post.findByIdAndUpdate(
+        req.params.postId,
+        { title, description, image, $inc: { editted: 1 } },
+        { new: true }
+      );
+      res
+        .status(200)
+        .json({ msg: 'Post updated successfully', post: updatePost });
+    } else if (email != oldPost.userEmail) {
+      res.status(401).json({msg: "Unauthorized editting", email: email})
+    } else {
+      res.status(400).json({msg: "Post already editted", post:oldPost});
+    }
   } catch (error) {
     res
       .status(400)
@@ -121,20 +132,21 @@ PostRouter.delete('/:postId', checkSessionExpiration, async (req, res) => {
       .json({ msg: 'Post deleted successfully', post: deletedPost });
   } catch (error) {
     res
-      .status(400)
+      .status(401)
       .json({ msg: 'Failed to delete post', error: error.message });
   }
 });
 
 // Upvote a post.
+// Add check to ensure that one who has upvoted before cannot upvote again
 PostRouter.put('/:postId/upvote', checkSessionExpiration, async (req, res) => {
   try {
-    const voterId = req.body;
+    const user = req.body;
     const post = await Post.findById(req.params.postId);
-    if (!post.upvotesArray.includes(voterId.voterId)) {
+    if (!post.upvotesArray.includes(user.email)) {
       const updatedArray = await Post.findByIdAndUpdate(
         req.params.postId,
-        { $push: { upvotesArray: voterId.voterId } },
+        { $push: { upvotesArray: user.email } },
         { new: true }
       )
       console.log(post.upvotesArray);
@@ -157,17 +169,18 @@ PostRouter.put('/:postId/upvote', checkSessionExpiration, async (req, res) => {
 });
 
 // Downvote a post.
+// Add check to ensure that one who has downvoted before cannot downvote again
 PostRouter.put(
   '/:postId/downvote',
   checkSessionExpiration,
   async (req, res) => {
     try {
-      const voterId = req.body;
+      const user = req.body;
       const post = await Post.findById(req.params.postId);
-      if (!post.downvotesArray.includes(voterId.voterId)) {
+      if (!post.downvotesArray.includes(user.email)) {
         const updatedArray = await Post.findByIdAndUpdate(
           req.params.postId,
-          { $push: { downvotesArray: voterId.voterId } },
+          { $push: { downvotesArray: user.email } },
           { new: true }
         )
         console.log(post.downvotesArray);

@@ -25,6 +25,10 @@ const PostSchema = new mongoose.Schema({
     type: String,
     default: 'Popular junctions and roundabouts',
   },
+  editted: {
+    type: Number,
+    default: 0
+  },
   upvotes: {
     type: Number,
     default: 0,
