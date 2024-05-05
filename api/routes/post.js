@@ -55,6 +55,17 @@ PostRouter.post(
   }
 );
 
+// Get all drafts for a specific user
+PostRouter.get('/getDrafts/:userEmail', checkSessionExpiration, async (req, res) => {
+  try {
+    const { userEmail } = req.params.userEmail;
+    const drafts = await Draft.find({ userEmail });
+    res.status(200).json(drafts);
+  } catch (error) {
+    res.status(400).json({ msg: 'Failed to fetch drafts', error: error.message });
+  }
+});
+
 // Get all posts without authentication
 PostRouter.get('/', async (req, res) => {
   try {
@@ -68,9 +79,9 @@ PostRouter.get('/', async (req, res) => {
 });
 
 // Get all posts by categories without authentication
-PostRouter.get('/Categories', async (req, res) => {
+PostRouter.get('/Categories/:category', async (req, res) => {
   try {
-    const { category } = req.body;
+    const { category } = req.params.category;
     const posts = await Post.find({ category });
     res.status(200).json(posts);
   } catch (error) {
@@ -81,10 +92,10 @@ PostRouter.get('/Categories', async (req, res) => {
 });
 
 // Get all posts for a specific blogger. Including checkSessionExpiration middleware
-PostRouter.get('/usersPosts', checkSessionExpiration, async (req, res) => {
+PostRouter.get('/usersPosts/:userEmail', checkSessionExpiration, async (req, res) => {
   try {
-    const user = req.body;
-    const posts = await Post.find({ userEmail: user.email });
+    const userEmail = req.params.userEmail;
+    const posts = await Post.find({ userEmail: userEmail });
     res.status(200).json(posts);
   } catch (error) {
     res
