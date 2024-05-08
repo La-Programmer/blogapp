@@ -56,13 +56,39 @@ PostRouter.post(
 );
 
 // Get all drafts for a specific user
-PostRouter.get('/getDrafts/:userEmail', checkSessionExpiration, async (req, res) => {
+PostRouter.get('/getDrafts', checkSessionExpiration, async (req, res) => {
   try {
-    const { userEmail } = req.params.userEmail;
+    const { userEmail } = req.body;
     const drafts = await Draft.find({ userEmail });
     res.status(200).json(drafts);
   } catch (error) {
     res.status(400).json({ msg: 'Failed to fetch drafts', error: error.message });
+  }
+});
+
+// Update a draft by draft ID
+PostRouter.put('/draft/:draftId', checkSessionExpiration, async (req, res) => {
+  try {
+    const { title, description, image, category } = req.body;
+    const { draftId } = req.params;
+
+    // Check if the draft exists
+    const existingDraft = await Draft.findById(draftId);
+    if (!existingDraft) {
+      return res.status(404).json({ msg: 'Draft not found' });
+    }
+
+    // Update the draft
+    existingDraft.title = title;
+    existingDraft.description = description;
+    existingDraft.image = image;
+    existingDraft.category = category;
+
+    const updatedDraft = await existingDraft.save();
+
+    res.status(200).json({ msg: 'Draft updated successfully', draft: updatedDraft });
+  } catch (error) {
+    res.status(400).json({ msg: 'Failed to update draft', error: error.message });
   }
 });
 
@@ -79,9 +105,9 @@ PostRouter.get('/', async (req, res) => {
 });
 
 // Get all posts by categories without authentication
-PostRouter.get('/Categories/:category', async (req, res) => {
+PostRouter.get('/Categories', async (req, res) => {
   try {
-    const { category } = req.params.category;
+    const { category } = req.body;
     const posts = await Post.find({ category });
     res.status(200).json(posts);
   } catch (error) {
@@ -92,10 +118,10 @@ PostRouter.get('/Categories/:category', async (req, res) => {
 });
 
 // Get all posts for a specific blogger. Including checkSessionExpiration middleware
-PostRouter.get('/usersPosts/:userEmail', checkSessionExpiration, async (req, res) => {
+PostRouter.get('/usersPosts', checkSessionExpiration, async (req, res) => {
   try {
-    const userEmail = req.params.userEmail;
-    const posts = await Post.find({ userEmail: userEmail });
+    const user = req.body;
+    const posts = await Post.find({ userEmail: user.email });
     res.status(200).json(posts);
   } catch (error) {
     res
