@@ -23,9 +23,9 @@ CommentRouter.post('/', checkSessionExpiration, async (req, res) => {
 });
 
 // Get all the comments associated with a post
-CommentRouter.get('/', checkSessionExpiration, async (req, res) => {
+CommentRouter.get('/:postId', checkSessionExpiration, async (req, res) => {
   try {
-    const postId = req.body;
+    const postId = req.params.postId;
     const comments = await Comment.find({ postId });
     res.status(200).json(comments);
   } catch (error) {
