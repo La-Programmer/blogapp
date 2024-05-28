@@ -12,14 +12,15 @@ const port = process.env.PORT;
 
 const app = express();
 
-const allowedOrigins = '*';
+// const allowedOrigins = '*';
 
-const corsOptions = {
-  origin: allowedOrigins,
-  credentials: true
-};
+// const corsOptions = {
+//   origin: allowedOrigins,
+//   credentials: true
+// };
 
 app.use(express.json());
+app.options('*', cors())
 app.use(cors(corsOptions));
 app.use('/api/user', UserRouter);
 app.use('/api/post', PostRouter);
