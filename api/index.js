@@ -12,14 +12,17 @@ const port = process.env.PORT;
 
 const app = express();
 
-const allowedOrigins = '*';
+// const allowedOrigins = '*';
 
-const corsOptions = {
-  origin: allowedOrigins
-};
+// const corsOptions = {
+//   origin: allowedOrigins
+// };
 
 app.use(express.json());
 app.use(cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*")
+}) 
 app.use('/api/user', UserRouter);
 app.use('/api/post', PostRouter);
 app.use('/api/comment', CommentRouter);
