@@ -12,7 +12,7 @@ const port = process.env.PORT;
 
 const app = express();
 
-const allowedOrigins = false;
+const allowedOrigins = '*';
 
 const corsOptions = {
   origin: allowedOrigins
