@@ -19,7 +19,7 @@ const corsOptions = {
 };
 
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors());
 app.use('/api/user', UserRouter);
 app.use('/api/post', PostRouter);
 app.use('/api/comment', CommentRouter);
