@@ -21,7 +21,7 @@ const app = express();
 
 app.use(express.json());
 app.options('*', cors())
-app.use(cors(corsOptions));
+app.use(cors());
 app.use('/api/user', UserRouter);
 app.use('/api/post', PostRouter);
 app.use('/api/comment', CommentRouter);
