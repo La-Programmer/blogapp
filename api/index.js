@@ -12,7 +12,7 @@ const port = process.env.PORT;
 
 const app = express();
 
-const allowedOrigins = 'https://blogapp-vtdd.onrender.com/';
+const allowedOrigins = 'https://along-preview.netlify.app';
 
 const corsOptions = {
   origin: allowedOrigins
