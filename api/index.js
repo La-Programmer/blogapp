@@ -15,7 +15,8 @@ const app = express();
 const allowedOrigins = 'https://along-preview.netlify.app';
 
 const corsOptions = {
-  origin: allowedOrigins
+  origin: allowedOrigins,
+  credentials: true
 };
 
 app.use(express.json());
