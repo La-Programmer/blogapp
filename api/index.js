@@ -12,16 +12,14 @@ const port = process.env.PORT;
 
 const app = express();
 
-// const allowedOrigins = '*';
+const allowedOrigins = 'https://blogapp-vtdd.onrender.com/';
 
-// const corsOptions = {
-//   origin: allowedOrigins,
-//   credentials: true
-// };
+const corsOptions = {
+  origin: allowedOrigins
+};
 
 app.use(express.json());
-app.options('*', cors())
-app.use(cors());
+app.use(cors(corsOptions));
 app.use('/api/user', UserRouter);
 app.use('/api/post', PostRouter);
 app.use('/api/comment', CommentRouter);
